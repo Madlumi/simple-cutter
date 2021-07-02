@@ -1,16 +1,13 @@
 @echo off
 setlocal enabledelayedexpansion
 
-
-::FORMAT for cut.txt:
+::read cuts.txt
+::FORMAT:
 
 ::"filename"                      < in quotes
 ::(cut1 start),(cut1 lenth)
 ::(cut2 start),(cut2 lenth)
 ::...
-
-
-::read cuts.txt
 set itt=0
 for /f "tokens=1-2 delims=," %%i  IN (cuts.txt) do (
 	if !itt! gtr 0 (
@@ -25,7 +22,7 @@ for /f "tokens=1-2 delims=," %%i  IN (cuts.txt) do (
 	    ::read file name
 		set inp=%%i
 		::set output name
-		set out=[edited]!inp!
+		set out=!inp:~0,-5![edited]!inp:~-5,-1!
 	) 
 	
 	::itterate on itt
@@ -45,3 +42,4 @@ del parts.txt
 endlocal
 pause
 exit
+
