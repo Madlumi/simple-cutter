@@ -45,7 +45,7 @@ for /f "tokens=1-2 delims=," %%i  IN (cuts.txt) do (
 			set /a s3=60+!s3!
 			set /a m3-=1
 		)
-		if 10 gtr !m3!  (
+		if 0 gtr !m3!  (
 			set /a m3=60+!m3!
 			set /a h3-=1
 		)
