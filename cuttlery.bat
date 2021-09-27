@@ -51,7 +51,7 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 
 		echo !a!
 		echo !b!
-		echo !k!
+		
 		REM separate data
 		set s1=!a:~-2,9999!
 		set m1=!a:~-5,-3!
@@ -60,6 +60,7 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 		set s2=!b:~-2,9999!
 		set m2=!b:~-5,-3!
 		set h2=!b:~-8,-6!
+		echo --a
 		REM make sure is defined
 		IF NOT DEFINED h1 set h1=0
 		IF NOT DEFINED h2 set h2=0
@@ -67,15 +68,34 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 		IF NOT DEFINED m2 set m2=0
 		IF NOT DEFINED s1 set s1=0
 		IF NOT DEFINED s2 set s2=0
+		REM CLEAR LEADING ZEROES
+		echo set /a s1=10000!m1! %% 10000
+		set /a s1=10000!s1! %% 10000
+		set /a m1=10000!m1! %% 10000
+		set /a h1=10000!h1! %% 10000
+		
+		set /a s2=10000!s2! %% 10000
+		set /a m2=10000!m2! %% 10000
+		set /a h2=10000!h2! %% 10000
+		
 		REM diference
 		
-		set /a s3=!s2!-!s1!
-		set /a m3=!m2!-!m1!
-		set /a h3=!h2!-!h1!
 		
-		REM echo !s3!,!m3!,!h3!
-		REM echo !s2!,!m2!,!h2!
-		REM echo !s1!,!m1!,!h1!
+		
+		echo --b
+		
+		set /a s3=!s2!-!s1!
+		echo !s3!=!s2!-!s1!
+		
+		set /a m3=!m2!-!m1!
+		echo !m3!=!m2!-!m1!
+		set /a h3=!h2!-!h1!
+		echo !h3!=!h2!-!h1!
+		echo !s3!
+		echo --c
+		 echo !s3!,!m3!,!h3!
+		 echo !s2!,!m2!,!h2!
+		 echo !s1!,!m1!,!h1!
 
 		REM convert negatives to time
 		if 0 gtr !s3!  (
@@ -86,7 +106,7 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 			set /a m3=60+!m3!
 			set /a h3-=1
 		)
-
+		echo ------
 		REM pad w zeroes
 		if 10 gtr !s3!  (
 			set /a s3=!s3!
@@ -105,6 +125,8 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 		echo !c!
 		echo ------
 		REM make clip
+		echo -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+		echo ffmpeg -i !inp! -ss !a! -t !c! -c copy part_!itt!.mp4
 		ffmpeg -i !inp! -ss !a! -t !c! -c copy part_!itt!.mp4
 		
 		REM APPEND TO TXT FILE
@@ -121,6 +143,8 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 		if exist parts.txt (
 			REM if name exists: save
 			::combine cuts
+			echo -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+			echo ffmpeg -f concat -i parts.txt -c copy "!nm!.mp4"
 			ffmpeg -f concat -i parts.txt -c copy "!nm!.mp4"
 
 			::cleanup
@@ -145,8 +169,9 @@ for /f "tokens=1-2 delims=;" %%r  IN (cuts.txt) do (
 REM to avoid needing an extra name or end in the cuts file we make sure to save the last clip anyways
 if exist parts.txt (
 	::combine cuts
+	echo -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+	echo ffmpeg -f concat -i parts.txt -c copy "!nm!.mp4"
 	ffmpeg -f concat -i parts.txt -c copy "!nm!.mp4"
-
 	::cleanup
 	for /f "tokens=1 delims=," %%i  IN (parts.txt) do (
 		set f=%%i
